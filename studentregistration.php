@@ -1,20 +1,19 @@
 <?php
-include 'dbconnect.php'; // Update the path if needed
-// Connect to the database
+include 'dbconnect.php'; // Ensure correct path
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    // Collect form data safely
+    // Collect form data
     $name = $_POST['name'] ?? '';
-    $department = $_POST['department'] ?? NULL; // optional
+    $department = $_POST['department'] ?? NULL;
     $gsuite_email = $_POST['gsuite_email'] ?? '';
-    $student_id = $_POST['student_id'] ?? ''; // Collect student_id
-    // $username = $_POST['username'] ?? '';     // Collect username
+    $student_id = $_POST['student_id'] ?? '';
+    $username = $_POST['username'] ?? ''; // Required for both User and Student
     $password = $_POST['password'] ?? '';
     $confirm_password = $_POST['confirm_password'] ?? '';
 
     // Basic validation
-    if (empty($name) || empty($gsuite_email) || empty($password)) {
-        echo "<script>alert('Name, GSuite Email, and Password are required fields!');</script>";
+    if (empty($name) || empty($gsuite_email) || empty($password) || empty($username)) {
+        echo "<script>alert('Name, Username, GSuite Email, and Password are required!');</script>";
         exit();
     }
 
@@ -23,35 +22,31 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         exit();
     }
 
+    // Insert into User table with type 'student'
+    $stmt_user = $conn->prepare("INSERT INTO User (username, password, type) VALUES (?, ?, 'student')");
+    $stmt_user->bind_param("ss", $username, $password);
 
-    // Prepare the SQL statement
-    $sql = "INSERT INTO studentregistration (Name, Department, GSuiteEmail, StudentID, Password) VALUES ( ?, ?, ?, ?, ?)";
-    
-    $stmt = mysqli_prepare($conn, $sql);
+    if ($stmt_user->execute()) {
+        // 2. Insert into Student table
+        $stmt_student = $conn->prepare("INSERT INTO Student (id, username, name, department, gsuite_email) VALUES (?, ?, ?, ?, ?)");
+        $stmt_student->bind_param("issss", $student_id, $username, $name, $department, $gsuite_email);
 
-    if ($stmt) {
-        // Bind parameters
-        mysqli_stmt_bind_param($stmt, "sssss", $name, $department, $gsuite_email, $student_id, $password);
-
-        // Execute the statement
-        if (mysqli_stmt_execute($stmt)) {
+        if ($stmt_student->execute()) {
             echo "<script>alert('Student registered successfully!');</script>";
         } else {
-            // Handle unique constraint errors
-            $error = mysqli_stmt_error($stmt);
-            if (strpos($error, 'Duplicate entry') !== false) {
-                echo "<script>alert('Error: GSuite Email or Password already exists!');</script>";
-            } else {
-                echo "<script>alert('Error: " . $error . "');</script>";
-            }
+            echo "<script>alert('Error inserting into Student: " . $stmt_student->error . "');</script>";
         }
 
-        mysqli_stmt_close($stmt);
+        $stmt_student->close();
     } else {
-        echo "<script>alert('Error preparing statement: " . mysqli_error($conn) . "');</script>";
+        echo "<script>alert('Error inserting into User: " . $stmt_user->error . "');</script>";
     }
+
+    $stmt_user->close();
+    $conn->close();
 }
 ?>
+
 
 
 
@@ -129,10 +124,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
             <section class="form-section">
                 <div class="form-row">
-                    <!-- <div class="form-group">
+                    <div class="form-group">
                         <label for="username">Username</label>
                         <input type="text" id="username" name="username" placeholder="username">
-                    </div> -->
+                    </div>
                     <div class="form-group">
                         <label for="password">Password</label>
                         <input type="password" id="password" name="password" placeholder="Your Unique Password">

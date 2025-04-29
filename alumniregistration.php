@@ -1,67 +1,42 @@
 <?php
-include 'dbconnect.php'; // Connect to the database
+include 'dbconnect.php'; // Include database connection
 
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    // Collect form data safely
-    $name = $_POST['name'] ?? '';
-    $gender = $_POST['gender'] ?? '';
-    $dob = $_POST['dob'] ?? '';
-    $student_id = $_POST['student_id'] ?? '';
-    $place_of_birth = $_POST['place_of_birth'] ?? '';
-    $hometown = $_POST['hometown'] ?? '';
-    $country = $_POST['country'] ?? '';
-    $address = $_POST['address'] ?? '';
-    $district = $_POST['district'] ?? '';
-    $residence_period = $_POST['residence_period'] ?? '';
-    $telephone = $_POST['telephone'] ?? '';
-    $mobile = $_POST['mobile'] ?? '';
-    $email = $_POST['email'] ?? '';
-    $gsuite_email = $_POST['gsuite_email'] ?? '';
-    $programme = $_POST['programme'] ?? '';
-    $level = $_POST['level'] ?? '';
-    $duration = $_POST['duration'] ?? '';
-    $designation = $_POST['designation'] ?? '';
-    $company = $_POST['company'] ?? '';
-    $location = $_POST['location'] ?? '';
-    $working_since = $_POST['working_since'] ?? '';
-    $username = $_POST['username'] ?? '';
-    $password = $_POST['password'] ?? '';
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $username = $_POST['username'];
+    $password = $_POST['password']; // Secure password hashing
+    $name = $_POST['name'];
+    $gender = $_POST['gender'];
+    $dob = $_POST['dob'];
+    $email = $_POST['email'];
+    $phone = $_POST['phone'];
+    $home_address = $_POST['home_address'];
+    $program = $_POST['program'];
+    $session = $_POST['session'];
+    $cgpa = $_POST['cgpa'];
+    $designation = $_POST['designation'];
+    $company_name = $_POST['company_name'];
+    $job_location = $_POST['job_location'];
 
-    // Set username if empty
-    if (empty($username)) {
-        $username = $student_id;
-    }
+    // Insert into user table with type 'alumni'
+    $stmt = $conn->prepare("INSERT INTO User (username, password, type) VALUES (?, ?, 'alumni')");
+    $stmt->bind_param("ss", $username, $password);
+    
+    if ($stmt->execute()) {
+        // Now, insert into Alumni table
+        $stmt = $conn->prepare("INSERT INTO Alumni (username, name, gender, dob, email, phone, home_address, program, session, cgpa, designation, company_name, job_location) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+        $stmt->bind_param("sssssssssdsss", $username, $name, $gender, $dob, $email, $phone, $home_address, $program, $session, $cgpa, $designation, $company_name, $job_location);
 
-    // Hash the password
-    #$hashed_password = password_hash($password, PASSWORD_DEFAULT);
-
-    // Prepare an SQL statement with placeholders
-    $sql = "INSERT INTO alumniregistration 
-    (name, gender, dob, student_id, place_of_birth, hometown, country, address, district, residence_period, telephone, mobile, email, gsuite_email, programme, level, duration, designation, company, location, working_since, username, password)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-
-    $stmt = mysqli_prepare($conn, $sql);
-
-    if ($stmt) {
-        // Bind parameters: 23 strings = 23 's'
-        mysqli_stmt_bind_param($stmt, 
-            "sssssssssssssssssssssss", 
-            $name, $gender, $dob, $student_id, $place_of_birth, $hometown, $country, $address, $district, $residence_period,
-            $telephone, $mobile, $email, $gsuite_email, $programme, $level, $duration, $designation, $company, $location,
-            $working_since, $username, $password
-        );
-
-        // Execute the statement
-        if (mysqli_stmt_execute($stmt)) {
-            echo "<script>alert('Application submitted successfully!');</script>";
+        if ($stmt->execute()) {
+            echo "Alumni registration successful!";
         } else {
-            echo "<script>alert('Error: " . mysqli_stmt_error($stmt) . "');</script>";
+            echo "Error inserting into Alumni: " . $stmt->error;
         }
-
-        mysqli_stmt_close($stmt);
     } else {
-        echo "<script>alert('Error preparing statement: " . mysqli_error($conn) . "');</script>";
+        echo "Error inserting into User: " . $stmt->error;
     }
+
+    $stmt->close();
+    $conn->close();
 }
 ?>
 
@@ -80,10 +55,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <header class="header">
         <div class="container">
             <div class="logo-container">
-                <img src="brac.png" alt="BRACU Alumni Logo" class="logo">
+                <img src="#" alt="BRACU Logo" class="logo">
             </div>
             <nav class="nav">
-                <a href="#">HOME</a>
+                <a href="index.html">HOME</a>
                 <a href="#" class="active">APPLY</a>
                 <a href="#">ABOUT</a>
                 <a href="#">HELP</a>
@@ -106,7 +81,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 
                 <div class="form-row">
                     <div class="form-group">
-                        <label for="name">First Name</label>
+                        <label for="name">Name</label>
                         <input type="text" id="name" name="name" placeholder="Full Name">
                     </div>
                 </div>
@@ -120,55 +95,21 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                         <label for="dob">Date Of Birth</label>
                         <input type="date" id="dob" name="dob">
                     </div>
-                    <div class="form-group">
-                        <label for="student-id">Student ID</label>
-                        <input type="text" id="student-id" name="student_id" placeholder="Student ID">
-                    </div>
                 </div>
 
                 <div class="form-row">
-                    <div class="form-group">
-                        <label for="place-of-birth">Place Of Birth</label>
-                        <input type="text" id="place-of-birth" name="place_of_birth" placeholder="Place of Birth">
-                    </div>
-                    <div class="form-group">
-                        <label for="hometown">Hometown</label>
-                        <input type="text" id="hometown" name="hometown" placeholder="Hometown">
-                    </div>
-                    <div class="form-group">
-                        <label for="country">Country</label>
-                        <input type="text" id="country" name="country" placeholder="Country">
-                    </div>
-                </div>
-
                 <div class="form-group">
                     <label for="address">Permanent Home Address</label>
-                    <input type="text" id="address" name="address" placeholder="Home Address">
-                </div>
-
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="district">District / Region</label>
-                        <input type="text" id="district" name="district" placeholder="District / Region">
-                    </div>
-                    <div class="form-group">
-                        <label for="residence-period">Residence Period</label>
-                        <input type="text" id="residence-period" name="residence_period" placeholder="e.g., 4 years">
-                    </div>
+                    <input type="text" id="address" name="home_address" placeholder="Home Address">
                 </div>
             </section>
 
             <section class="form-section">
-                <h2>Contact</h2>
-                
+                <h2>Contact</h2>              
                 <div class="form-row">
                     <div class="form-group">
-                        <label for="telephone">Telephone</label>
-                        <input type="tel" id="telephone" name="telephone" placeholder="Telephone">
-                    </div>
-                    <div class="form-group">
                         <label for="mobile">Mobile</label>
-                        <input type="tel" id="mobile" name="mobile" placeholder="Mobile">
+                        <input type="tel" id="mobile" name="phone" placeholder="Mobile">
                     </div>
                 </div>
 
@@ -176,10 +117,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     <div class="form-group">
                         <label for="email">Email</label>
                         <input type="email" id="email" name="email" placeholder="Email Address">
-                    </div>
-                    <div class="form-group">
-                        <label for="gsuite-email">G-Suite Email Address</label>
-                        <input type="email" id="gsuite-email" name="gsuite_email" placeholder="G-Suite Email Address">
                     </div>
                 </div>
             </section>
@@ -190,23 +127,21 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 <div class="form-row">
                     <div class="form-group">
                         <label for="programme">Academic Programme of Study</label>
-                        <input type="text" id="programme" name="programme" placeholder="Programme of Study">
+                        <input type="text" id="programme" name="program" placeholder="Programme of Study">
                     </div>
                     <div class="form-group">
-                        <label for="level">Level of Study</label>
-                        <input type="text" id="level" name="level" placeholder="Level">
+                        <label for="session">Session</label>
+                        <input type="text" id="session" name="session" placeholder="Session">
                     </div>
                 </div>
-
                 <div class="form-group">
-                    <label for="duration">Duration Of Study</label>
-                    <input type="text" id="duration" name="duration" placeholder="Duration">
+                    <label for="duration">CGPA</label>
+                    <input type="text" id="cgpa" name="cgpa" placeholder="Your CGPA">
                 </div>
             </section>
 
             <section class="form-section">
                 <h2>Employment</h2>
-
                 <div class="form-row">
                     <div class="form-group">
                         <label for="designation">Designation</label>
@@ -214,18 +149,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     </div>
                     <div class="form-group">
                         <label for="company">Company</label>
-                        <input type="text" id="company" name="company" placeholder="Company Name">
+                        <input type="text" id="company" name="company_name" placeholder="Company Name">
                     </div>
                 </div>
 
                 <div class="form-row">
                     <div class="form-group">
                         <label for="location">Company Location</label>
-                        <input type="text" id="location" name="location" placeholder="Company Location">
-                    </div>
-                    <div class="form-group">
-                        <label for="working-since">Working Since</label>
-                        <input type="text" id="working-since" name="working_since" placeholder="e.g., 2022">
+                        <input type="text" id="location" name="job_location" placeholder="Company Location">
                     </div>
                 </div>
                 <div class="form-row">
