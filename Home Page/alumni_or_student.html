@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Select Registration Type</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            height: 100vh;
+            background: linear-gradient(to right, white #2575fc);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .selection-container {
+            background: white;
+            padding: 40px 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            width: 320px;
+            text-align: center;
+        }
+
+        .selection-container h1 {
+            font-size: 24px;
+            margin-bottom: 30px;
+            color: #333;
+        }
+
+        .btn {
+            display: block;
+            width: 100%;
+            margin: 10px 0;
+            padding: 12px;
+            font-size: 18px;
+            background-color: #2575fc;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            text-decoration: none;
+            font-weight: bold;
+            transition: background 0.3s;
+        }
+
+        .btn:hover {
+            background-color: white;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="selection-container">
+        <h1>Are you an Alumni or Student?</h1>
+        <a href="http://localhost/student_alumni_network_system/registration/alumniregistration.php" class="btn">Alumni</a>
+        <a href="http://localhost/student_alumni_network_system/registration/studentregistration.php" class="btn">Student</a>
+    </div>
+
+</body>
+</html>
