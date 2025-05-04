@@ -16,6 +16,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $designation = $_POST['designation'];
     $company_name = $_POST['company_name'];
     $job_location = $_POST['job_location'];
+<<<<<<< HEAD
 
     // Insert into user table with type 'alumni'
     $stmt = $conn->prepare("INSERT INTO User (username, password, type) VALUES (?, ?, 'alumni')");
@@ -34,6 +35,66 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     } else {
         echo "Error inserting into User: " . $stmt->error;
     }
+=======
+    // Validation
+    $errors = [];
+
+    if (empty($username)) {
+        $errors[] = "Username is required.";
+    }
+
+    if (empty($password)) {
+        $errors[] = "Password is required.";
+    } elseif (strlen($password) < 6) {
+        $errors[] = "Password must be at least 6 characters long.";
+    }
+
+    if (empty($email)) {
+        $errors[] = "Email is required.";
+    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $errors[] = "Invalid email format.";
+    }
+
+    if (empty($phone)) {
+        $errors[] = "Phone number is required.";
+    } elseif (!preg_match('/^\d{11}$/', $phone)) {
+        $errors[] = "Phone number must be exactly 11 digits.";
+    }
+
+    if (empty($program)){
+        $errors[] = "Program is required.";
+    }
+
+    if (!is_numeric($cgpa) || $cgpa < 0 || $cgpa > 4) {
+        $errors[] = "Invalid CGPA. Must be between 0 and 4.";
+    }
+
+
+    // Show errors if any
+    if (!empty($errors)) {
+        foreach ($errors as $error) {
+            echo "<p style='color:red;'>$error</p>";
+        }
+        exit;
+    }
+    // Insert into user table with type 'alumni'
+    $stmt = $conn->prepare("INSERT INTO User (username, password, type) VALUES (?, ?, 'alumni')");
+    $stmt->bind_param("ss", $username, $password);
+    
+    if ($stmt->execute()) {
+        // Now, insert into Alumni table
+        $stmt = $conn->prepare("INSERT INTO Alumni (username, name, gender, dob, email, phone, home_address, program, session, cgpa, designation, company_name, job_location) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+        $stmt->bind_param("sssssssssdsss", $username, $name, $gender, $dob, $email, $phone, $home_address, $program, $session, $cgpa, $designation, $company_name, $job_location);
+
+        if ($stmt->execute()) {
+            echo "Alumni registration successful!";
+        } else {
+            echo "Error inserting into Alumni: " . $stmt->error;
+        }
+    } else {
+        echo "Error inserting into User: " . $stmt->error;
+    }
+>>>>>>> 2ce45a9 (edited inserted event)
 
     $stmt->close();
     $conn->close();
@@ -78,6 +139,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <form class="application-form" method="POST" action="">
             <section class="form-section">
                 <h2>Personal Information of Applicant</h2>
+                <div>* denotes the required fields</div>
                 
                 <div class="form-row">
                     <div class="form-group">
@@ -108,14 +170,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <h2>Contact</h2>              
                 <div class="form-row">
                     <div class="form-group">
+<<<<<<< HEAD
                         <label for="mobile">Mobile</label>
+=======
+                        <label for="mobile">* Mobile</label>
+>>>>>>> 2ce45a9 (edited inserted event)
                         <input type="tel" id="mobile" name="phone" placeholder="Mobile">
                     </div>
                 </div>
 
                 <div class="form-row">
                     <div class="form-group">
-                        <label for="email">Email</label>
+                        <label for="email">* Email</label>
                         <input type="email" id="email" name="email" placeholder="Email Address">
                     </div>
                 </div>
@@ -126,7 +192,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 
                 <div class="form-row">
                     <div class="form-group">
+<<<<<<< HEAD
                         <label for="programme">Academic Programme of Study</label>
+=======
+                        <label for="programme">* Academic Programme of Study</label>
+>>>>>>> 2ce45a9 (edited inserted event)
                         <input type="text" id="programme" name="program" placeholder="Programme of Study">
                     </div>
                     <div class="form-group">
@@ -161,15 +231,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 </div>
                 <div class="form-row">
                     <div class="form-group">
-                        <label for="username">Username</label>
+                        <label for="username">* Username</label>
                         <input type="text" id="username" name="username" placeholder="username">
                     </div>
                     <div class="form-group">
-                        <label for="password">Password</label>
+                        <label for="password">* Password</label>
                         <input type="text" id="password" name="password" placeholder="Your Unique Password">
                     </div>
                     <div class="form-group">
-                        <label for="password">Confirm Your Password</label>
+                        <label for="password">* Confirm Your Password</label>
                         <input type="text" id="password" name="password" placeholder="">
                     </div>
                 </div>

@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>BRACU Alumni - Events</title>
+    <link rel="stylesheet" href="event.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"/>
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="logo-container">
+                <img src="brac.png" alt="BRACU Alumni Logo" class="logo"/>
+            </div>
+            <nav class="nav">
+                <a href="#">HOME</a>
+                <a href="#" class="active">APPLY</a>
+                <a href="#">ABOUT</a>
+                <a href="#">HELP</a>
+                <a href="#">CONTACT</a>
+                <a href="#">EVENTS</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        <h1 class="page-title">Events</h1>
+
+        <!-- Create Event Section -->
+        <section class="create-event-section">
+            <h2 class="form-title">Create Events</h2>
+            <p class="form-subtitle">Kindly Fill up This Form</p>
+            <form class="event-form" action="event.php" method="POST">
+                <!-- ID is auto-increment in DB, so no input needed -->
+            
+                <div class="form-group">
+                    <label for="event_name">Event Name:</label>
+                    <input type="text" id="event_name" name="event_name" required />
+                </div>
+            
+                <div class="form-group">
+                    <label for="event_description">Event Description:</label>
+                    <textarea id="event_description" name="event_description" rows="4" required></textarea>
+                </div>
+            
+                <div class="form-group">
+                    <label for="start_time">Start Time:</label>
+                    <input type="datetime-local" id="start_time" name="start_time" required />
+                </div>
+            
+                <div class="form-group">
+                    <label for="end_time">End Time:</label>
+                    <input type="datetime-local" id="end_time" name="end_time" required />
+                </div>
+            
+                <div class="form-group">
+                    <label for="event_creator">Event Creator:</label>
+                    <input type="text" id="event_creator" name="event_creator" required />
+                </div>
+            
+                <button type="submit" class="submit-btn">Submit Event</button>
+            </form>
+    
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-section">
+                <h3>Contact Us</h3>
+                <p>+232 54 456 7296</p>
+                <p>BRACulture@gmail.com</p>
+            </div>
+            <div class="footer-section">
+                <h3>Legal</h3>
+                <a href="#">Legal Notice</a>
+                <a href="#">Privacy Policy</a>
+                <a href="#">Terms And Conditions</a>
+            </div>
+            <div class="footer-section">
+                <h3>Follow Us</h3>
+                <div class="social-links">
+                    <a href="#"><i class="fab fa-twitter"></i> Twitter</a>
+                    <a href="#"><i class="fab fa-facebook"></i> Facebook</a>
+                    <a href="#"><i class="fab fa-instagram"></i> Instagram</a>
+                </div>
+            </div>
+        </div>
+        <div class="copyright">
+            Copyright &copy; BRACU / alumni 2025
+        </div>
+    </footer>
+</body>
+</html>

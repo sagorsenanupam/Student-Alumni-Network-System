@@ -11,14 +11,57 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $password = $_POST['password'] ?? '';
     $confirm_password = $_POST['confirm_password'] ?? '';
 
+<<<<<<< HEAD
     // Basic validation
     if (empty($name) || empty($gsuite_email) || empty($password) || empty($username)) {
         echo "<script>alert('Name, Username, GSuite Email, and Password are required!');</script>";
         exit();
+=======
+    // // Basic validation
+    // if (empty($name) || empty($gsuite_email) || empty($password) || empty($username)) {
+    //     echo "<script>alert('Name, Username, GSuite Email, and Password are required!');</script>";
+    //     exit();
+    // }
+
+    // if ($password !== $confirm_password) {
+    //     echo "<script>alert('Passwords do not match!');</script>";
+    //     exit();
+    // }
+    $errors = [];
+
+    // Required fields check
+    if (empty($username)) {
+        $errors[] = "Username is required.";
+    }
+
+    if (empty($password)) {
+        $errors[] = "Password is required.";
+    } elseif (strlen($password) < 6) {
+        $errors[] = "Password must be at least 6 characters.";
+>>>>>>> 2ce45a9 (edited inserted event)
     }
 
     if ($password !== $confirm_password) {
-        echo "<script>alert('Passwords do not match!');</script>";
+        $errors[] = "Passwords do not match.";
+    }
+
+    if (empty($gsuite_email)) {
+        $errors[] = "Gsuite email is required.";
+    } elseif (!preg_match('/^[a-zA-Z0-9._%+-]+@g\.bracu\.ac\.bd$/', $gsuite_email)) {
+        $errors[] = "Invalid Gsuite email format. Must be in the format name@g.bracu.ac.bd";
+    }
+
+    if (empty($student_id)) {
+        $errors[] = "Student ID is required.";
+    } elseif (!preg_match('/^\d{6}$/', $student_id)) {
+        $errors[] = "Student ID must be exactly 6 digits.";
+    }
+
+    // If errors, show all
+    if (!empty($errors)) {
+        foreach ($errors as $error) {
+            echo "<p style='color:red;'>$error</p>";
+        }
         exit();
     }
 
@@ -88,6 +131,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         <form class="application-form" method="POST" action="">
             <section class="form-section">
                 <h2>Personal Information of Applicant</h2>
+                <div>* denotes the required fields</div>
+
                 
                 <div class="form-row">
                     <div class="form-group">
@@ -98,7 +143,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
                 <div class="form-row">
                     <div class="form-group">
-                        <label for="student-id">Student ID</label>
+                        <label for="student-id">* Student ID</label>
                         <input type="text" id="student-id" name="student_id" placeholder="Student ID">
                     </div>
                 </div>
@@ -106,7 +151,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
             <section class="form-section">
                     <div class="form-group">
-                        <label for="gsuite-email">G-Suite Email Address</label>
+                        <label for="gsuite-email">* G-Suite Email Address</label>
                         <input type="email" id="gsuite-email" name="gsuite_email" placeholder="G-Suite Email Address">
                     </div>
             </section>
@@ -124,16 +169,23 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
             <section class="form-section">
                 <div class="form-row">
+<<<<<<< HEAD
                     <div class="form-group">
                         <label for="username">Username</label>
                         <input type="text" id="username" name="username" placeholder="username">
                     </div>
+=======
+>>>>>>> 2ce45a9 (edited inserted event)
                     <div class="form-group">
-                        <label for="password">Password</label>
+                        <label for="username">* Username</label>
+                        <input type="text" id="username" name="username" placeholder="username">
+                    </div>
+                    <div class="form-group">
+                        <label for="password">* Password</label>
                         <input type="password" id="password" name="password" placeholder="Your Unique Password">
                     </div>
                     <div class="form-group">
-                        <label for="confirm_password">Confirm Your Password</label>
+                        <label for="confirm_password">* Confirm Your Password</label>
                         <input type="password" id="confirm_password" name="confirm_password">
 
                     </div>

@@ -1,4 +1,5 @@
 <?php
+<<<<<<< HEAD
 include 'dbconnect.php'; // Ensure correct path
 session_start();
 
@@ -7,16 +8,53 @@ $adminUsername = "admin";
 $adminPassword = "admin";
 
 // Handle login form submission
+=======
+include 'dbconnect.php';
+session_start();
+
+$message = '';
+
+>>>>>>> 2ce45a9 (edited inserted event)
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $username = $_POST['username'] ?? '';
     $password = $_POST['password'] ?? '';
 
+<<<<<<< HEAD
     if ($username === $adminUsername && $password === $adminPassword) {
+=======
+    // Check for admin login
+    if ($username === 'admin' && $password === 'admin') {
+>>>>>>> 2ce45a9 (edited inserted event)
         $_SESSION['admin_logged_in'] = true;
         header("Location: admin_panel.php");
         exit();
     } else {
+<<<<<<< HEAD
         $error = "Invalid username or password.";
+=======
+        // Check for approved users in the User table
+        $stmt = $conn->prepare("SELECT password FROM User WHERE username = ?");
+        $stmt->bind_param("s", $username);
+        $stmt->execute();
+        $stmt->store_result();
+
+        if ($stmt->num_rows === 1) {
+            $stmt->bind_result($Password);
+            $stmt->fetch();
+
+            if ($password === $Password) {
+                $_SESSION['user_logged_in'] = true;
+                $_SESSION['username'] = $username;
+                $message = "Successfully logged in as user.";
+            } else {
+                $message = "Incorrect password.";
+            }
+        } else {
+            $message = "User not found or not approved.";
+        }
+
+        $stmt->close();
+>>>>>>> 2ce45a9 (edited inserted event)
     }
 }
 ?>
@@ -26,6 +64,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <head>
     <meta charset="UTF-8">
     <title>BRACU Alumni - Login</title>
+<<<<<<< HEAD
     <style>
         body {
             background-color: #f5f7fa;
@@ -130,3 +169,58 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 </div>
 </body>
 </html>
+=======
+    <link rel="stylesheet" href="../Home Page/login.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="login-page">
+        <div class="login-image">
+            <img src="../assets/image16.png" alt="Graduate Image">
+        </div>
+        <div class="login-container">
+            <div class="login-card">
+                <h1>Log In</h1>
+                <p class="welcome-text">Welcome Back.<br>Please Enter Your Details.</p>
+
+                <?php if (!empty($message)): ?>
+                    <p style="color: red; text-align:center;"><?php echo $message; ?></p>
+                <?php endif; ?>
+
+                <form class="login-form" method="POST" action="">
+                    <div class="form-group">
+                        <label for="username">Username</label>
+                        <input type="text" name="username" id="username" placeholder="Your username" required>
+                    </div>
+
+                    <div class="form-group password-group">
+                        <label for="password">Password</label>
+                        <div class="password-wrapper">
+                            <input type="password" name="password" id="password" placeholder="**********" required>
+                            <span class="toggle-password" onclick="togglePassword()">👁️</span>
+                        </div>
+                    </div>
+
+                    <div class="divider"></div>
+
+                    <button type="submit" class="login-btn">Login</button>
+                </form>
+
+                <p class="signup-text">Don't have an account? <a href="../Home Page/alumni_or_student.html" class="signup-link">Sign Up</a></p>
+            </div>
+
+            <footer class="copyright">
+                Copyright &copy; BRACU Alumni 2025
+            </footer>
+        </div>
+    </div>
+
+    <script>
+        function togglePassword() {
+            const passwordInput = document.getElementById("password");
+            passwordInput.type = passwordInput.type === "password" ? "text" : "password";
+        }
+    </script>
+</body>
+</html>
+>>>>>>> 2ce45a9 (edited inserted event)
