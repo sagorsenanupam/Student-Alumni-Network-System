@@ -2,6 +2,9 @@
 include 'dbconnect.php';
 session_start();
 
+$adminUsername = 'admin';
+$adminPassword = 'admin';
+
 $message = '';
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {

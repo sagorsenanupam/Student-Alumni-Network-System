@@ -2,19 +2,26 @@
 include 'dbconnect.php'; // Ensure correct path
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    // Collect form data
-    $name = $_POST['name'] ?? '';
-    $department = $_POST['department'] ?? NULL;
-    $gsuite_email = $_POST['gsuite_email'] ?? '';
-    $student_id = $_POST['student_id'] ?? '';
-    $username = $_POST['username'] ?? ''; // Required for both User and Student
-    $password = $_POST['password'] ?? '';
-    $confirm_password = $_POST['confirm_password'] ?? '';
+    // Collect form data safely
+    $name = trim($_POST['name'] ?? '');
+    $department = trim($_POST['department'] ?? '');
+    $gsuite_email = trim($_POST['gsuite_email'] ?? '');
+    $student_id = trim($_POST['student_id'] ?? '');
+    $username = trim($_POST['username'] ?? '');
+    $password = trim($_POST['password'] ?? '');
+    $confirm_password = trim($_POST['confirm_password'] ?? '');
 
-    // Basic validation
-    if (empty($name) || empty($gsuite_email) || empty($password) || empty($username)) {
-        echo "<script>alert('Name, Username, GSuite Email, and Password are required!');</script>";
-        exit();
+    $errors = [];
+
+    // Required fields check
+    if (empty($username)) {
+        $errors[] = "Username is required.";
+    }
+
+    if (empty($password)) {
+        $errors[] = "Password is required.";
+    } elseif (strlen($password) < 6) {
+        $errors[] = "Password must be at least 6 characters.";
     }
 
     if ($password !== $confirm_password) {
@@ -41,24 +48,24 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         exit();
     }
 
-    // Insert into User table with type 'student'
+    // Insert into User table
     $stmt_user = $conn->prepare("INSERT INTO User (username, password, type) VALUES (?, ?, 'student')");
     $stmt_user->bind_param("ss", $username, $password);
 
     if ($stmt_user->execute()) {
-        // 2. Insert into Student table
+        // Insert into Student table
         $stmt_student = $conn->prepare("INSERT INTO Student (id, username, name, department, gsuite_email) VALUES (?, ?, ?, ?, ?)");
         $stmt_student->bind_param("issss", $student_id, $username, $name, $department, $gsuite_email);
 
         if ($stmt_student->execute()) {
-            echo "<script>alert('Student registered successfully!');</script>";
+            echo "<p style='color:green;'>Student registered successfully!</p>";
         } else {
-            echo "<script>alert('Error inserting into Student: " . $stmt_student->error . "');</script>";
+            echo "<p style='color:red;'>Error inserting into Student: " . $stmt_student->error . "</p>";
         }
 
         $stmt_student->close();
     } else {
-        echo "<script>alert('Error inserting into User: " . $stmt_user->error . "');</script>";
+        echo "<p style='color:red;'>Error inserting into User: " . $stmt_user->error . "</p>";
     }
 
     $stmt_user->close();
@@ -87,7 +94,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 <img src="brac.png" alt="BRACU Alumni Logo" class="logo">
             </div>
             <nav class="nav">
-                <a href="index.html">HOME</a>
+                <a href="#">HOME</a>
                 <a href="#" class="active">APPLY</a>
                 <a href="#">ABOUT</a>
                 <a href="#">HELP</a>
@@ -120,7 +127,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 <div class="form-row">
                     <div class="form-group">
                         <label for="student-id">* Student ID</label>
-                        <input type="text" id="student-id" name="student_id" placeholder="Student ID">
+                        <input type="text" id="student-id" name="student_id" placeholder="Student ID" required>
                     </div>
                 </div>
             </section>
@@ -145,24 +152,17 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
             <section class="form-section">
                 <div class="form-row">
-<<<<<<< HEAD
-                    <div class="form-group">
-                        <label for="username">Username</label>
-                        <input type="text" id="username" name="username" placeholder="username">
-                    </div>
-=======
->>>>>>> 2ce45a9 (edited inserted event)
                     <div class="form-group">
                         <label for="username">* Username</label>
-                        <input type="text" id="username" name="username" placeholder="username">
+                        <input type="text" id="username" name="username" placeholder="username" required>
                     </div>
                     <div class="form-group">
                         <label for="password">* Password</label>
-                        <input type="password" id="password" name="password" placeholder="Your Unique Password">
+                        <input type="password" id="password" name="password" placeholder="Your Unique Password" required>
                     </div>
                     <div class="form-group">
                         <label for="confirm_password">* Confirm Your Password</label>
-                        <input type="password" id="confirm_password" name="confirm_password">
+                        <input type="password" id="confirm_password" name="confirm_password" required>
 
                     </div>
                 </div>

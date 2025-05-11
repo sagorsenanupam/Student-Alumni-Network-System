@@ -2,38 +2,87 @@
 include 'dbconnect.php'; // Include database connection
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $username = $_POST['username'];
-    $password = $_POST['password']; // Secure password hashing
-    $name = $_POST['name'];
-    $gender = $_POST['gender'];
-    $dob = $_POST['dob'];
-    $email = $_POST['email'];
-    $phone = $_POST['phone'];
-    $home_address = $_POST['home_address'];
-    $program = $_POST['program'];
-    $session = $_POST['session'];
-    $cgpa = $_POST['cgpa'];
-    $designation = $_POST['designation'];
-    $company_name = $_POST['company_name'];
-    $job_location = $_POST['job_location'];
-    $student_id = $_POST['student_id']; // Capture student ID
+    // Collect and trim input
+    $username = trim($_POST['username']);
+    $student_id = trim($_POST['student_id']); // Capture student ID
+    $password = trim($_POST['password']);
+    $name = trim($_POST['name']);
+    $gender = trim($_POST['gender']);
+    $dob = trim($_POST['dob']);
+    $email = trim($_POST['email']);
+    $phone = trim($_POST['phone']);
+    $home_address = trim($_POST['home_address']);
+    $program = trim($_POST['program']);
+    $session = trim($_POST['session']);
+    $cgpa = trim($_POST['cgpa']);
+    $designation = trim($_POST['designation']);
+    $company_name = trim($_POST['company_name']);
+    $job_location = trim($_POST['job_location']);
 
-    // Insert into user table with type 'alumni'
+    // Validation
+    $errors = [];
+
+    if (empty($username)) {
+        $errors[] = "Username is required.";
+    }
+
+    if (empty($student_id)) {
+        $errors[] = "Student ID is required.";
+    } elseif (!is_numeric($student_id)) {
+        $errors[] = "Student ID must be a number.";
+    }    
+
+    if (empty($password)) {
+        $errors[] = "Password is required.";
+    } elseif (strlen($password) < 6) {
+        $errors[] = "Password must be at least 6 characters long.";
+    }
+
+    if (empty($email)) {
+        $errors[] = "Email is required.";
+    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $errors[] = "Invalid email format.";
+    }
+
+    if (empty($phone)) {
+        $errors[] = "Phone number is required.";
+    } elseif (!preg_match('/^\d{11}$/', $phone)) {
+        $errors[] = "Phone number must be exactly 11 digits.";
+    }
+
+    if (empty($program)){
+        $errors[] = "Program is required.";
+    }
+
+    if (!is_numeric($cgpa) || $cgpa < 0 || $cgpa > 4) {
+        $errors[] = "Invalid CGPA. Must be between 0 and 4.";
+    }
+
+
+    // Show errors if any
+    if (!empty($errors)) {
+        foreach ($errors as $error) {
+            echo "<p style='color:red;'>$error</p>";
+        }
+        exit;
+    }
+
+    // Insert into User table
     $stmt = $conn->prepare("INSERT INTO User (username, password, type) VALUES (?, ?, 'alumni')");
     $stmt->bind_param("ss", $username, $password);
-    
+
     if ($stmt->execute()) {
-        // Now, insert into Alumni table including student_id
+        // Insert into Alumni table
         $stmt = $conn->prepare("INSERT INTO Alumni (username, name, gender, dob, email, phone, home_address, program, session, cgpa, designation, company_name, job_location, student_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
         $stmt->bind_param("sssssssssdsssd", $username, $name, $gender, $dob, $email, $phone, $home_address, $program, $session, $cgpa, $designation, $company_name, $job_location, $student_id);
 
         if ($stmt->execute()) {
-            echo "Alumni registration successful!";
+            echo "<p style='color:green;'>Alumni registration successful!</p>";
         } else {
-            echo "Error inserting into Alumni: " . $stmt->error;
+            echo "<p style='color:red;'>Error inserting into Alumni: " . $stmt->error . "</p>";
         }
     } else {
-        echo "Error inserting into User: " . $stmt->error;
+        echo "<p style='color:red;'>Error inserting into User: " . $stmt->error . "</p>";
     }
 
     $stmt->close();
@@ -100,10 +149,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 </div>
 
                 <div class="form-row">
-                    <div class="form-group">
-                        <label for="address">Permanent Home Address</label>
-                        <input type="text" id="address" name="home_address" placeholder="Home Address">
-                    </div>
+                <div class="form-group">
+                    <label for="address">Permanent Home Address</label>
+                    <input type="text" id="address" name="home_address" placeholder="Home Address">
                 </div>
             </section>
 
@@ -111,15 +159,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <h2>Contact</h2>              
                 <div class="form-row">
                     <div class="form-group">
-                        <label for="mobile">Mobile</label>
-                        <input type="tel" id="mobile" name="phone" placeholder="Mobile">
+                        <label for="mobile">* Mobile</label>
+                        <input type="tel" id="mobile" name="phone" placeholder="Mobile" required>
                     </div>
                 </div>
 
                 <div class="form-row">
                     <div class="form-group">
                         <label for="email">* Email</label>
-                        <input type="email" id="email" name="email" placeholder="Email Address">
+                        <input type="email" id="email" name="email" placeholder="Email Address" required>
                     </div>
                 </div>
             </section>
@@ -129,8 +177,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 
                 <div class="form-row">
                     <div class="form-group">
-                        <label for="programme">Academic Programme of Study</label>
-                        <input type="text" id="programme" name="program" placeholder="Programme of Study">
+                        <label for="programme">* Academic Programme of Study</label>
+                        <input type="text" id="programme" name="program" placeholder="Programme of Study" required>
                     </div>
                     <div class="form-group">
                         <label for="session">Session</label>
@@ -168,21 +216,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         <input type="text" id="location" name="job_location" placeholder="Company Location">
                     </div>
                 </div>
-            </section>
-
-            <section class="form-section">
                 <div class="form-row">
                     <div class="form-group">
                         <label for="username">* Username</label>
-                        <input type="text" id="username" name="username" placeholder="Username">
+                        <input type="text" id="username" name="username" placeholder="username" required>
                     </div>
                     <div class="form-group">
                         <label for="password">* Password</label>
-                        <input type="password" id="password" name="password" placeholder="Your Unique Password">
+                        <input type="text" id="password" name="password" placeholder="Your Unique Password" required>
                     </div>
                     <div class="form-group">
-                        <label for="confirm_password">* Confirm Your Password</label>
-                        <input type="password" id="confirm_password" name="confirm_password" placeholder="Confirm Password">
+                        <label for="password">* Confirm Your Password</label>
+                        <input type="text" id="password" name="password" placeholder="" required>
                     </div>
                 </div>
             </section>
