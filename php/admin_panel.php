@@ -42,25 +42,28 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 $pendingStudents = [];
 $pendingAlumni = [];
 
-$studentResult = $conn->query("SELECT username FROM Student WHERE approve = 0");
+$studentResult = $conn->query("SELECT username, gsuite_email FROM Student WHERE approve = 0");
 if ($studentResult) {
     while ($row = $studentResult->fetch_assoc()) {
-        $pendingStudents[] = $row['username'];
+        $pendingStudents[] = [
+            'username' => $row['username'],
+            'gsuite_email' => $row['gsuite_email']
+        ];
     }
 }
 
-$alumniResult = $conn->query("SELECT username FROM Alumni WHERE approve = 0");
+$alumniResult = $conn->query("SELECT username, student_id FROM Alumni WHERE approve = 0");
 if ($alumniResult) {
     while ($row = $alumniResult->fetch_assoc()) {
-        $pendingAlumni[] = $row['username'];
+        $pendingAlumni[] = [
+            'username' => $row['username'],
+            'student_id' => $row['student_id']
+        ];
     }
 }
 
 $conn->close();
 ?>
-
-<!-- [Your existing HTML layout goes here - no changes needed to the design portion] -->
-
 
 <!DOCTYPE html>
 <html lang="en">
@@ -165,8 +168,6 @@ $conn->close();
         button.reject {
             color: red;
         }
-        button.approve { color: green; }
-        button.reject { color: red; }
     </style>
 </head>
 <body>
@@ -188,19 +189,22 @@ $conn->close();
     <!-- Students -->
     <div class="column">
         <h2>Pending Students</h2>
-        <?php foreach ($pendingStudents as $username): ?>
+        <?php foreach ($pendingStudents as $student): ?>
             <div class="user-card">
                 <img src="../assets/user.png" alt="User">
-                <span><?= htmlspecialchars($username) ?></span>
+                <span>
+                    <?= htmlspecialchars($student['username']) ?><br>
+                    <small style="color:gray;">GSuite: <?= htmlspecialchars($student['gsuite_email']) ?></small>
+                </span>
                 <div class="action-buttons">
                     <form method="POST" action="admin_panel.php" style="display:inline;">
-                        <input type="hidden" name="username" value="<?= htmlspecialchars($username) ?>">
+                        <input type="hidden" name="username" value="<?= htmlspecialchars($student['username']) ?>">
                         <input type="hidden" name="type" value="student">
                         <input type="hidden" name="action" value="approve">
                         <button type="submit" class="approve" title="Approve">&#10004;</button>
                     </form>
                     <form method="POST" action="admin_panel.php" style="display:inline;">
-                        <input type="hidden" name="username" value="<?= htmlspecialchars($username) ?>">
+                        <input type="hidden" name="username" value="<?= htmlspecialchars($student['username']) ?>">
                         <input type="hidden" name="type" value="student">
                         <input type="hidden" name="action" value="reject">
                         <button type="submit" class="reject" title="Reject">&#10060;</button>
@@ -213,19 +217,22 @@ $conn->close();
     <!-- Alumni -->
     <div class="column">
         <h2>Pending Alumni</h2>
-        <?php foreach ($pendingAlumni as $username): ?>
+        <?php foreach ($pendingAlumni as $alumni): ?>
             <div class="user-card">
                 <img src="../assets/alumni.png" alt="User">
-                <span><?= htmlspecialchars($username) ?></span>
+                <span>
+                    <?= htmlspecialchars($alumni['username']) ?><br>
+                    <small style="color:gray;">Student ID: <?= htmlspecialchars($alumni['student_id']) ?></small>
+                </span>
                 <div class="action-buttons">
                     <form method="POST" action="admin_panel.php" style="display:inline;">
-                        <input type="hidden" name="username" value="<?= htmlspecialchars($username) ?>">
+                        <input type="hidden" name="username" value="<?= htmlspecialchars($alumni['username']) ?>">
                         <input type="hidden" name="type" value="alumni">
                         <input type="hidden" name="action" value="approve">
                         <button type="submit" class="approve" title="Approve">&#10004;</button>
                     </form>
                     <form method="POST" action="admin_panel.php" style="display:inline;">
-                        <input type="hidden" name="username" value="<?= htmlspecialchars($username) ?>">
+                        <input type="hidden" name="username" value="<?= htmlspecialchars($alumni['username']) ?>">
                         <input type="hidden" name="type" value="alumni">
                         <input type="hidden" name="action" value="reject">
                         <button type="submit" class="reject" title="Reject">&#10060;</button>

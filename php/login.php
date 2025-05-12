@@ -4,20 +4,55 @@ session_start();
 
 $adminUsername = 'admin';
 $adminPassword = 'admin';
-
-$message = '';
+$error = '';
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    // Retrieve and sanitize form input
     $username = $_POST['username'] ?? '';
-    $password = $_POST['password'] ?? '';
+    $password = $_POST['password'] ?? '';  // Ensure password is set
 
+    // Check if password field is empty
+    if (empty($password)) {
+        $error = "Password is required.";
+    }
+
+    // Admin login check
     if ($username === $adminUsername && $password === $adminPassword) {
         $_SESSION['admin_logged_in'] = true;
         header("Location: admin_panel.php");
         exit();
-    } else {
-        $error = "Invalid username or password.";
     }
+
+    // Check alumni login
+    $stmt = $conn->prepare("SELECT * FROM alumni WHERE username = ?");
+    $stmt->bind_param("s", $username);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    if ($result && $result->num_rows === 1) {
+        $user = $result->fetch_assoc();
+
+        // Verify password (use password_verify for production)
+        if ($password === $user['password']) {
+            $_SESSION['username'] = $user['username'];
+            $_SESSION['user_type'] = 'alumni';
+
+            // Check if alumni is approved by admin
+            if ($user['approve'] == 1) {
+                // Redirect to alumni profile page if approved
+                header("Location: loginprofile.php");
+                exit();
+            } else {
+                $error = "Admin has not approved you yet.";
+            }
+        } else {
+            $error = "Incorrect password.";
+        }
+    } else {
+        $error = "User not found.";
+    }
+
+    $stmt->close();
 }
 ?>
 
@@ -25,6 +60,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BRACU Alumni - Login</title>
     <style>
         body {
@@ -109,6 +145,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <h1>Log In</h1>
         <p class="welcome-text">Welcome back. Please enter your credentials.</p>
 
+        <!-- Show error message if any -->
         <?php if (!empty($error)): ?>
             <div class="error"><?= htmlspecialchars($error) ?></div>
         <?php endif; ?>
