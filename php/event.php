@@ -4,6 +4,12 @@ include 'dbconnect.php';
 $success = '';
 $error = '';
 
+$event_name = '';
+$event_description = '';
+$start_time = '';
+$end_time = '';
+$event_creator = '';
+
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $event_name = trim($_POST['event_name']);
     $event_description = trim($_POST['event_description']);
@@ -12,7 +18,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $event_creator = trim($_POST['event_creator']);
 
     if (!empty($event_name) && !empty($event_description) && !empty($start_time) && !empty($end_time) && !empty($event_creator)) {
-
         // Check if event_creator exists in 'user' table
         $check_stmt = $conn->prepare("SELECT 1 FROM user WHERE username = ?");
         $check_stmt->bind_param("s", $event_creator);
@@ -26,15 +31,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
             if ($stmt->execute()) {
                 $success = "Event created successfully!";
+                // Clear form values
+                $event_name = $event_description = $start_time = $end_time = $event_creator = '';
             } else {
                 $error = "Error inserting event: " . $stmt->error;
             }
-
             $stmt->close();
         } else {
             $error = "Event creator not found in database.";
         }
-
         $check_stmt->close();
     } else {
         $error = "All fields are required.";
@@ -43,6 +48,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $conn->close();
 }
 ?>
+
 
 
 
@@ -300,12 +306,12 @@ main.container {
 <body>
 <header class="navbar">
     <div class="logo">
-        <a href="index.html">
+        <a href="index.php">
             <img src="../assets/logo2.png" alt="Logo">
         </a>
     </div>
     <nav class="nav-links">
-        <a href="index.html">Home</a>
+        <a href="index.php">Home</a>
         <a href="about.html">About</a>
         <a href="help.html">Help</a>
         <a href="contact.html">Contact</a>
@@ -315,72 +321,95 @@ main.container {
     </nav>
 </header>
 
-    <main class="container">
-        <h1 class="page-title">Events</h1>
+<body>
+<header class="navbar">
+    <div class="logo">
+        <a href="index.php">
+            <img src="../assets/logo2.png" alt="Logo">
+        </a>
+    </div>
+    <nav class="nav-links">
+        <a href="index.php">Home</a>
+        <a href="about.html">About</a>
+        <a href="help.html">Help</a>
+        <a href="contact.html">Contact</a>
+        <a href="event.php">Events</a>
+        <a href="alumni_or_student.html">Register</a>
+        <a href="login.php">Login</a>
+    </nav>
+</header>
 
-        <!-- Create Event Section -->
-        <section class="create-event-section">
-            <h2 class="form-title">Create Events</h2>
-            <p class="form-subtitle">Kindly Fill up This Form</p>
-            <form class="event-form" action="event.php" method="POST">
-                <!-- ID is auto-increment in DB, so no input needed -->
-            
-                <div class="form-group">
-                    <label for="event_name">Event Name:</label>
-                    <input type="text" id="event_name" name="event_name" required />
-                </div>
-            
-                <div class="form-group">
-                    <label for="event_description">Event Description:</label>
-                    <textarea id="event_description" name="event_description" rows="4" required></textarea>
-                </div>
-            
-                <div class="form-group">
-                    <label for="start_time">Start Time:</label>
-                    <input type="datetime-local" id="start_time" name="start_time" required />
-                </div>
-            
-                <div class="form-group">
-                    <label for="end_time">End Time:</label>
-                    <input type="datetime-local" id="end_time" name="end_time" required />
-                </div>
-            
-                <div class="form-group">
-                    <label for="event_creator">Event Creator:</label>
-                    <input type="text" id="event_creator" name="event_creator" required />
-                </div>
-            
-                <button type="submit" class="submit-btn">Submit Event</button>
-            </form>
-    
-        </section>
-    </main>
+<main class="container">
+    <h1 class="page-title">Events</h1>
 
-    <footer class="footer">
-        <div class="container">
-            <div class="footer-section">
-                <h3>Contact Us</h3>
-                <p>+232 54 456 7296</p>
-                <p>BRACulture@gmail.com</p>
+    <!-- Create Event Section -->
+    <section class="create-event-section">
+        <h2 class="form-title">Create Events</h2>
+        <p class="form-subtitle">Kindly Fill up This Form</p>
+
+        <?php if (!empty($error)): ?>
+            <p style="color: red; text-align: center;"><?php echo $error; ?></p>
+        <?php endif; ?>
+        <?php if (!empty($success)): ?>
+            <p style="color: green; text-align: center;"><?php echo $success; ?></p>
+        <?php endif; ?>
+
+        <form class="event-form" action="event.php" method="POST">
+            <div class="form-group">
+                <label for="event_name">Event Name:</label>
+                <input type="text" id="event_name" name="event_name" required value="<?php echo htmlspecialchars($event_name); ?>" />
             </div>
-            <div class="footer-section">
-                <h3>Legal</h3>
-                <a href="#">Legal Notice</a>
-                <a href="#">Privacy Policy</a>
-                <a href="#">Terms And Conditions</a>
+
+            <div class="form-group">
+                <label for="event_description">Event Description:</label>
+                <textarea id="event_description" name="event_description" rows="4" required><?php echo htmlspecialchars($event_description); ?></textarea>
             </div>
-            <div class="footer-section">
-                <h3>Follow Us</h3>
-                <div class="social-links">
-                    <a href="#"><i class="fab fa-twitter"></i> Twitter</a>
-                    <a href="#"><i class="fab fa-facebook"></i> Facebook</a>
-                    <a href="#"><i class="fab fa-instagram"></i> Instagram</a>
-                </div>
+
+            <div class="form-group">
+                <label for="start_time">Start Time:</label>
+                <input type="datetime-local" id="start_time" name="start_time" required value="<?php echo htmlspecialchars($start_time); ?>" />
+            </div>
+
+            <div class="form-group">
+                <label for="end_time">End Time:</label>
+                <input type="datetime-local" id="end_time" name="end_time" required value="<?php echo htmlspecialchars($end_time); ?>" />
+            </div>
+
+            <div class="form-group">
+                <label for="event_creator">Event Creator:</label>
+                <input type="text" id="event_creator" name="event_creator" required value="<?php echo htmlspecialchars($event_creator); ?>" />
+            </div>
+
+            <button type="submit" class="submit-btn">Submit Event</button>
+        </form>
+    </section>
+</main>
+
+<footer class="footer">
+    <div class="container">
+        <div class="footer-section">
+            <h3>Contact Us</h3>
+            <p>+232 54 456 7296</p>
+            <p>BRACulture@gmail.com</p>
+        </div>
+        <div class="footer-section">
+            <h3>Legal</h3>
+            <a href="#">Legal Notice</a>
+            <a href="#">Privacy Policy</a>
+            <a href="#">Terms And Conditions</a>
+        </div>
+        <div class="footer-section">
+            <h3>Follow Us</h3>
+            <div class="social-links">
+                <a href="#"><i class="fab fa-twitter"></i> Twitter</a>
+                <a href="#"><i class="fab fa-facebook"></i> Facebook</a>
+                <a href="#"><i class="fab fa-instagram"></i> Instagram</a>
             </div>
         </div>
-        <div class="copyright">
-            Copyright &copy; BRACU / alumni 2025
-        </div>
-    </footer>
+    </div>
+    <div class="copyright">
+        Copyright &copy; BRACU / alumni 2025
+    </div>
+</footer>
 </body>
 </html>

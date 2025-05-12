@@ -94,7 +94,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 <img src="brac.png" alt="BRACU Alumni Logo" class="logo">
             </div>
             <nav class="nav">
-                <a href="#">HOME</a>
+                <a href="index.php">HOME</a>
                 <a href="#" class="active">APPLY</a>
                 <a href="#">ABOUT</a>
                 <a href="#">HELP</a>

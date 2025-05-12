@@ -7,36 +7,57 @@ if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== tru
 
 include 'dbconnect.php';
 
+// Handle approvals and rejections
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $username = $_POST['username'];
-    $userType = $_POST['type'];
     $action = $_POST['action'];
 
-    if ($userType === 'student') {
-        $table = 'Student';
-    } elseif ($userType === 'alumni') {
-        $table = 'Alumni';
-    } else {
-        die("Invalid user type.");
+    if ($action === 'approve' || $action === 'reject') {
+        $username = $_POST['username'];
+        $userType = $_POST['type'];
+
+        if ($userType === 'student') {
+            $table = 'Student';
+        } elseif ($userType === 'alumni') {
+            $table = 'Alumni';
+        } else {
+            die("Invalid user type.");
+        }
+
+        if ($action === 'approve') {
+            $stmt = $conn->prepare("UPDATE $table SET approve = 1 WHERE username = ?");
+            $stmt->bind_param("s", $username);
+            $stmt->execute();
+            $stmt->close();
+        } elseif ($action === 'reject') {
+            $stmt = $conn->prepare("DELETE FROM $table WHERE username = ?");
+            $stmt->bind_param("s", $username);
+            $stmt->execute();
+            $stmt->close();
+
+            $stmt2 = $conn->prepare("DELETE FROM User WHERE username = ?");
+            $stmt2->bind_param("s", $username);
+            $stmt2->execute();
+            $stmt2->close();
+        }
     }
 
-    if ($action === 'approve') {
-        $stmt = $conn->prepare("UPDATE $table SET approve = 1 WHERE username = ?");
-        $stmt->bind_param("s", $username);
+    // Event approval/rejection
+    if ($action === 'approve_event') {
+        $event_id = $_POST['event_id'];
+        $stmt = $conn->prepare("UPDATE Event SET approve = 1 WHERE id = ?");
+        $stmt->bind_param("i", $event_id);
         $stmt->execute();
         $stmt->close();
-    } elseif ($action === 'reject') {
-        $stmt = $conn->prepare("DELETE FROM $table WHERE username = ?");
-        $stmt->bind_param("s", $username);
+    } elseif ($action === 'reject_event') {
+        $event_id = $_POST['event_id'];
+        $stmt = $conn->prepare("DELETE FROM Event WHERE id = ?");
+        $stmt->bind_param("i", $event_id);
         $stmt->execute();
         $stmt->close();
-
-        $stmt2 = $conn->prepare("DELETE FROM User WHERE username = ?");
-        $stmt2->bind_param("s", $username);
-        $stmt2->execute();
-        $stmt2->close();
     }
 }
+
+
 
 // Fetch pending users
 $pendingStudents = [];
@@ -60,6 +81,18 @@ if ($alumniResult) {
             'student_id' => $row['student_id']
         ];
     }
+}
+// Fetch pending events with creator type
+$pendingEvents = [];
+$eventResult = $conn->query("
+    SELECT Event.id, Event.event_name, Event.event_description, Event.start_time, Event.end_time,
+           Event.event_creator, User.type AS creator_type
+    FROM Event
+    JOIN User ON Event.event_creator = User.username
+    WHERE Event.approve = 0
+");
+while ($row = $eventResult->fetch_assoc()) {
+    $pendingEvents[] = $row;
 }
 
 $conn->close();
@@ -174,12 +207,13 @@ $conn->close();
 
 <div class="navbar">
     <div class="navbar-left">
-        <img src="../assets/logo1.png" alt="BRACU Logo">
-        <h1>Admin Panel of BRAC University Student-Alumni Network System</h1>
+        <img src="/assets/logo1.png" alt="BRACU Logo">
+        <h1>Admin Panel</h1>
     </div>
     <div class="navbar-right">
-        <a href="#">Report</a>
-        <a href="http://localhost/student_alumni_network_system/php/login.php">Logout Admin</a>
+        <a href="#">Home</a>
+        <a href="#">Admin</a>
+        <a href="#">Profile</a>
         <img src="../assets/admin.png" alt="Profile Icon">
     </div>
 </div>
@@ -240,18 +274,34 @@ $conn->close();
             </div>
         <?php endforeach; ?>
     </div>
-
-    <!-- Events Placeholder -->
+    <!-- Events -->
     <div class="column">
-        <h2>Pending Events</h2>
-        <div class="user-card">
-            <img src="../assets/event.png" alt="Event">
-            <span><strong>Tech Fair 2025</strong> by <em>creator_username</em></span>
-            <div class="action-buttons">
-                <button class="approve" title="Approve">&#10004;</button>
-                <button class="reject" title="Reject">&#10060;</button>
+        <h2>Pending Event Approvals</h2>
+        <?php foreach ($pendingEvents as $event): ?>
+            <div class="user-card">
+                <img src="../assets/event.png" alt="Event">
+                <span>
+                    <?= htmlspecialchars($event['event_name']) ?><br>
+                    <small style="color:gray;">
+                        <?= htmlspecialchars($event['start_time']) ?> to <?= htmlspecialchars($event['end_time']) ?><br>
+                        Created by: <?= htmlspecialchars($event['event_creator']) ?> (<?= htmlspecialchars($event['creator_type']) ?>)<br>
+                        <?= htmlspecialchars($event['event_description']) ?>
+                    </small>
+                </span>
+                <div class="action-buttons">
+                    <form method="POST" action="admin_panel.php" style="display:inline;">
+                        <input type="hidden" name="event_id" value="<?= htmlspecialchars($event['id']) ?>">
+                        <input type="hidden" name="action" value="approve_event">
+                        <button type="submit" class="approve" title="Approve">&#10004;</button>
+                    </form>
+                    <form method="POST" action="admin_panel.php" style="display:inline;">
+                        <input type="hidden" name="event_id" value="<?= htmlspecialchars($event['id']) ?>">
+                        <input type="hidden" name="action" value="reject_event">
+                        <button type="submit" class="reject" title="Reject">&#10060;</button>
+                    </form>
+                </div>
             </div>
-        </div>
+        <?php endforeach; ?>
     </div>
 </div>
 

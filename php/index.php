@@ -1,3 +1,37 @@
+<?php
+include 'dbconnect.php';
+
+// Predefined font colors to cycle through
+$colors = ['#FFD700', '#00FF7F', '#00BFFF', '#FF69B4', '#FF4500', '#ADFF2F', '#DA70D6'];
+$colorIndex = 0;
+
+$event_display = '';
+$sql = "SELECT event_name, event_description, start_time, end_time, event_creator FROM event WHERE approve = 1 ORDER BY start_time ASC";
+$result = $conn->query($sql);
+
+if ($result && $result->num_rows > 0) {
+    while ($row = $result->fetch_assoc()) {
+        $color = $colors[$colorIndex % count($colors)];
+        $event_text = htmlspecialchars($row['event_name']) . ' - ' .
+                      htmlspecialchars($row['event_description']) . ' (' .
+                      date('M d, H:i', strtotime($row['start_time'])) . ' to ' .
+                      date('M d, H:i', strtotime($row['end_time'])) . ') by ' .
+                      htmlspecialchars($row['event_creator']);
+
+        $event_display .= "<span style='color: $color; margin-right: 50px;'>$event_text</span>";
+
+        $colorIndex++;
+    }
+} else {
+    $event_display = "<span style='color: white;'>No upcoming events yet.</span>";
+}
+?>
+
+
+
+
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -13,11 +47,11 @@
 <header class="navbar">
     <div class="logo">
         <a href="index.html">
-            <img src="/assets/logo2.png" alt="Logo">
+            <img src="../assets/logo2.png" alt="Logo">
         </a>
     </div>
     <nav class="nav-links">
-        <a href="index.html">Home</a>
+        <a href="index.php">Home</a>
         <a href="about.html">About</a>
         <a href="help.html">Help</a>
         <a href="contact.html">Contact</a>
@@ -42,10 +76,12 @@
 
 
     <!-- Events Bar -->
-    <section class="events-bar">
-        <p><strong>Upcoming Events:</strong> 🟡 AI & Cyber Security R&D (Mar 26) | 🟢 Bengal Culture Showcase (Apr 14) | 🟣 Gaming Event: FIFA, WARZONE, VALORANT (Apr 22)</p>
+    <!-- Scrolling Events Section -->
+    <section class="scrolling-events">
+        <div class="scrolling-wrapper">
+            <?php echo $event_display ?: 'No upcoming events yet.'; ?>
+        </div>
     </section>
-
     <!-- Steps Section -->
     <section class="steps">
         <h1>GET YOURSELF CONNECTED WITH THE EXCELLENCE</h1>
@@ -74,12 +110,12 @@
         <p class="req-description">You must satisfy the following in order to be eligible for this application.</p>
         <div class="req-cards">
             <div class="req-card">
-                <img src="/assets/logo2.png" alt="Alumni Logo">
+                <img src="../assets/logo2.png" alt="Alumni Logo">
                 <h3>BRAC University Alumni</h3>
                 <p>Applicants must have been officially assigned to, and been a resident of BRAC University during their period of stay in the University.</p>
             </div>
             <div class="req-card">
-                <img src="/assets/graduation-hat.png" alt="Graduation Hat">
+                <img src="../assets/graduation-hat.png" alt="Graduation Hat">
                 <h3>University Student</h3>
                 <p>Applicants must be a student of BRAC University.</p>
             </div>
