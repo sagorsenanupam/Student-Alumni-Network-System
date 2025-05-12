@@ -7,43 +7,53 @@ $adminPassword = 'admin';
 $error = '';
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // Retrieve and sanitize form input
     $username = $_POST['username'] ?? '';
-    $password = $_POST['password'] ?? '';  // Ensure password is set
+    $password = $_POST['password'] ?? '';
 
-    // Check if password field is empty
-    if (empty($password)) {
-        $error = "Password is required.";
-    }
-
-    // Admin login check
+    // Admin login
     if ($username === $adminUsername && $password === $adminPassword) {
         $_SESSION['admin_logged_in'] = true;
         header("Location: admin_panel.php");
         exit();
     }
 
-    // Check alumni login
-    $stmt = $conn->prepare("SELECT * FROM alumni WHERE username = ?");
+    // Check user credentials in user table
+    $stmt = $conn->prepare("SELECT * FROM user WHERE username = ?");
     $stmt->bind_param("s", $username);
     $stmt->execute();
-    $result = $stmt->get_result();
+    $userResult = $stmt->get_result();
 
-    if ($result && $result->num_rows === 1) {
-        $user = $result->fetch_assoc();
+    if ($userResult && $userResult->num_rows === 1) {
+        $user = $userResult->fetch_assoc();
 
-        // Verify password (use password_verify for production)
         if ($password === $user['password']) {
-            $_SESSION['username'] = $user['username'];
-            $_SESSION['user_type'] = 'alumni';
+            // Password matched
+            if ($user['type'] === 'alumni') {
+                // Now check approval status from alumni table
+                $stmt2 = $conn->prepare("SELECT * FROM alumni WHERE username = ?");
+                $stmt2->bind_param("s", $username);
+                $stmt2->execute();
+                $alumniResult = $stmt2->get_result();
 
-            // Check if alumni is approved by admin
-            if ($user['approve'] == 1) {
-                // Redirect to alumni profile page if approved
-                header("Location: loginprofile.php");
-                exit();
+                if ($alumniResult && $alumniResult->num_rows === 1) {
+                    $alumni = $alumniResult->fetch_assoc();
+
+                    if ($alumni['approve'] == 1) {
+                        // Approved, proceed to profile
+                        $_SESSION['username'] = $username;
+                        $_SESSION['user_type'] = 'alumni';
+                        header("Location: loginprofile.php");
+                        exit();
+                    } else {
+                        $error = "Admin has not approved you yet.";
+                    }
+                } else {
+                    $error = "Alumni data not found.";
+                }
+
+                $stmt2->close();
             } else {
-                $error = "Admin has not approved you yet.";
+                $error = "You are not an alumni.";
             }
         } else {
             $error = "Incorrect password.";
@@ -55,6 +65,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $stmt->close();
 }
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">
