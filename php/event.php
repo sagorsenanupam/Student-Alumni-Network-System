@@ -86,7 +86,7 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 20px 60px;
+  padding: 20px 50px;
   background: rgb(235, 233, 233);
   position: fixed;
   width: 100%;
@@ -96,7 +96,7 @@ body {
 }
 
 .navbar .logo img {
-  width: 70px;
+  width: 60px;
   height: auto;
 }
 
