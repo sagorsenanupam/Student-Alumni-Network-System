@@ -268,9 +268,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       <a href="about.html">About</a>
       <a href="help.html">Help</a>
       <a href="contact.html">Contact</a>
-      <a href="/php/event.php">Events</a>
+      <a href="http://localhost/student_alumni_network_system/php/event.php">Events</a>
       <a href="alumni_or_student.html">Register</a>
-      <a href="/php/login.php">Login</a>
+      <a href="http://localhost/student_alumni_network_system/php/login.php">Logout</a>
     </nav>
   </header>
 

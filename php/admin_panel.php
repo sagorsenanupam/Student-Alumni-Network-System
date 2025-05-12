@@ -174,13 +174,12 @@ $conn->close();
 
 <div class="navbar">
     <div class="navbar-left">
-        <img src="/assets/logo1.png" alt="BRACU Logo">
-        <h1>Admin Panel</h1>
+        <img src="../assets/logo1.png" alt="BRACU Logo">
+        <h1>Admin Panel of BRAC University Student-Alumni Network System</h1>
     </div>
     <div class="navbar-right">
-        <a href="#">Home</a>
-        <a href="#">Admin</a>
-        <a href="#">Profile</a>
+        <a href="#">Report</a>
+        <a href="http://localhost/student_alumni_network_system/php/login.php">Logout Admin</a>
         <img src="../assets/admin.png" alt="Profile Icon">
     </div>
 </div>

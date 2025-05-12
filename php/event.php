@@ -55,23 +55,265 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <link rel="stylesheet" href="event.css" />
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet"/>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"/>
+    <style>
+        /* Base Styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Roboto', sans-serif;
+}
+
+html {
+  box-sizing: border-box;
+}
+
+body {
+  background-color: #f8f9fa;
+  color: #333;
+  line-height: 1.6;
+}
+
+.container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+/* Navbar */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 60px;
+  background: rgb(235, 233, 233);
+  position: fixed;
+  width: 100%;
+  top: 0;
+  z-index: 1000;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.navbar .logo img {
+  width: 70px;
+  height: auto;
+}
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.nav-links a {
+  text-decoration: none;
+  color: #333;
+  font-weight: 500;
+  font-size: 15px;
+  transition: color 0.3s;
+}
+
+.nav-links a:hover {
+  color: #4299e1;
+}
+
+/* Ensure content doesn't hide behind fixed navbar */
+main.container {
+  margin-top: 120px;
+}
+
+/* Page Title */
+.page-title {
+  font-size: 36px;
+  color: #2c3e50;
+  margin: 30px 0;
+  text-align: center;
+}
+
+/* Create Event Section */
+.create-event-section {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  padding: 30px;
+  margin: 50px auto;
+  max-width: 800px;
+}
+
+.form-title {
+  font-size: 24px;
+  color: #2c3e50;
+  margin-bottom: 5px;
+  text-align: center;
+}
+
+.form-subtitle {
+  color: #7f8c8d;
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.event-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.form-group label {
+  font-weight: 500;
+  color: #2c3e50;
+}
+
+.form-group input,
+.form-group textarea,
+.form-group select {
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 16px;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+  border-color: #3498db;
+  outline: none;
+}
+
+.form-group textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+.submit-btn {
+  background-color: #3498db;
+  color: white;
+  border: none;
+  padding: 14px;
+  border-radius: 4px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  margin-top: 20px;
+}
+
+.submit-btn:hover {
+  background-color: #54a9e2;
+}
+
+/* Footer Styles */
+.footer {
+  background-color: #2c3e50;
+  color: white;
+  padding: 40px 0 20px;
+}
+
+.footer .container {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 30px;
+}
+
+.footer-section {
+  flex: 1;
+  min-width: 200px;
+}
+
+.footer-section h3 {
+  font-size: 18px;
+  margin-bottom: 15px;
+  color: #ecf0f1;
+}
+
+.footer-section p,
+.footer-section a {
+  color: #bdc3c7;
+  margin-bottom: 10px;
+  display: block;
+  text-decoration: none;
+}
+
+.footer-section a:hover {
+  color: #3498db;
+}
+
+.social-links a {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.copyright {
+  text-align: center;
+  margin-top: 40px;
+  padding-top: 20px;
+  border-top: 1px solid #34495e;
+  color: #bdc3c7;
+  font-size: 14px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .navbar {
+    flex-direction: column;
+    padding: 20px;
+    gap: 10px;
+  }
+
+  .nav-links {
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  main.container {
+    margin-top: 180px; /* More space for stacked navbar */
+  }
+
+  .footer .container {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .nav-links a {
+    font-size: 13px;
+    padding: 4px 6px;
+  }
+
+  .submit-btn {
+    width: 100%;
+  }
+}
+    </style>
 </head>
 <body>
-    <header class="header">
-        <div class="container">
-            <div class="logo-container">
-                <img src="brac.png" alt="BRACU Alumni Logo" class="logo"/>
-            </div>
-            <nav class="nav">
-                <a href="index.html">HOME</a>
-                <a href="#" class="active">APPLY</a>
-                <a href="#">ABOUT</a>
-                <a href="#">HELP</a>
-                <a href="#">CONTACT</a>
-                <a href="#">EVENTS</a>
-            </nav>
-        </div>
-    </header>
+<header class="navbar">
+    <div class="logo">
+        <a href="index.html">
+            <img src="../assets/logo2.png" alt="Logo">
+        </a>
+    </div>
+    <nav class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="about.html">About</a>
+        <a href="help.html">Help</a>
+        <a href="contact.html">Contact</a>
+        <a href="http://localhost/student_alumni_network_system/php/event.php">Events</a>
+        <a href="alumni_or_student.html">Register</a>
+        <a href="http://localhost/student_alumni_network_system/php/login.php">Login</a>
+    </nav>
+</header>
 
     <main class="container">
         <h1 class="page-title">Events</h1>
