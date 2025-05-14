@@ -13,13 +13,14 @@ $result = $conn->query($sql);
 if ($result && $result->num_rows > 0) {
     while ($row = $result->fetch_assoc()) {
         $color = $colors[$colorIndex % count($colors)];
-        $event_text = htmlspecialchars($row['event_name']) . ' - ' .
+        $event_text =  ' || ' . htmlspecialchars($row['event_name']) . ' - ' .
                       htmlspecialchars($row['event_description']) . ' (' .
                       date('M d, H:i', strtotime($row['start_time'])) . ' to ' .
                       date('M d, H:i', strtotime($row['end_time'])) . ') by ' .
-                      htmlspecialchars($row['event_creator']);
+                      htmlspecialchars($row['event_creator']) . ' || ';
 
-        $event_display .= "<span style='color: $color; margin-right: 50px;'>$event_text</span>";
+                    $event_display .= "<span class='event-item' style='color: $color;' title='" . htmlspecialchars($event_text) . "'>$event_text</span>";
+
         $colorIndex++;
     }
 } else {
@@ -35,6 +36,45 @@ if ($result && $result->num_rows > 0) {
     <title>Alumni Registration - Inspiring Excellence</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
+    <style>
+        .scrolling-events {
+
+    overflow: hidden;
+    white-space: nowrap;
+    padding: 15px 0;
+    color: white;
+    font-size: 16px;
+    font-weight: 500;
+    position: relative;
+}
+
+.scrolling-wrapper {
+    display: inline-block;
+    padding-left: 100%;
+    animation: scroll-left 30s linear infinite;
+}
+
+.scrolling-events:hover .scrolling-wrapper {
+    animation-play-state: paused;
+}
+
+@keyframes scroll-left {
+    0% {
+        transform: translateX(0%);
+    }
+    100% {
+        transform: translateX(-100%);
+    }
+}
+
+.event-item {
+    display: inline-block;
+    margin-right: 80px;
+    cursor: pointer;
+}
+
+        
+    </style>
 </head>
 <body>
 
@@ -51,6 +91,7 @@ if ($result && $result->num_rows > 0) {
         <a href="help.html">Help</a>
         <a href="contact.html">Contact</a>
         <a href="event.php">Events</a>
+        
 
         <?php if (isset($_SESSION['user_type']) && in_array($_SESSION['user_type'], ['student', 'alumni'])): ?>
     <a href="chat.php">Chat</a>
