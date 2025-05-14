@@ -85,6 +85,7 @@ if ($result && $result->num_rows > 0) {
             <img src="../assets/logo2.png" alt="Logo">
         </a>
     </div>
+    
     <nav class="nav-links">
         <a href="index.php">Home</a>
         <a href="about.html">About</a>
