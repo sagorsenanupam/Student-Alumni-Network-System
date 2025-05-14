@@ -248,13 +248,13 @@ body {
     <!-- Navigation Bar -->
     <header class="navbar">
     <div class="logo">
-        <a href="index.html">
+        <a href="index.php">
             <img src="../assets/logo2.png" alt="Logo">
         </a>
     </div>
     <nav class="nav-links">
         <a href="index.php">Home</a>
-        <a href="about.html">About</a>
+        <a href="index.php">About</a>
         <a href="http://localhost/student_alumni_network_system/php/event.php">Events</a>
         <a href="alumni_or_student.html">Register</a>
         <a href="http://localhost/student_alumni_network_system/php/login.php">Logout</a>

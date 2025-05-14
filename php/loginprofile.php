@@ -259,19 +259,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   <!-- Navigation Bar -->
   <header class="navbar">
     <div class="logo">
-      <a href="index.html">
+      <a href="index.php">
         <img src="../assets/logo2.png" alt="Logo" />
       </a>
     </div>
     <nav class="nav-links">
-      <a href="index.html">Home</a>
-      <a href="about.html">About</a>
-      <a href="help.html">Help</a>
-      <a href="contact.html">Contact</a>
-      <a href="http://localhost/student_alumni_network_system/php/event.php">Events</a>
-      <a href="alumni_or_student.html">Register</a>
-      <a href="http://localhost/student_alumni_network_system/php/login.php">Logout</a>
-    </nav>
+  <a href="index.php">Home</a>
+  <a href="chat.php">Chat</a>
+  <a href="contact.html">Contact</a>
+  <a href="event.php">Events</a>
+  <a href="help.html">Help</a>
+  <a href="login.php">Logout</a>
+</nav>
+
   </header>
 
   <!-- Profile Section -->

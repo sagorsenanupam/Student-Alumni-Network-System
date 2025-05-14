@@ -13,7 +13,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Admin login
     if ($username === $adminUsername && $password === $adminPassword) {
         $_SESSION['admin_logged_in'] = true;
-        header("Location: admin_panel.php");
+        $_SESSION['username'] = 'admin';
+        $_SESSION['user_type'] = 'admin';
+        $_SESSION['redirect_target'] = 'admin_panel.php';
+        header("Location: login_redirect.php");
         exit();
     }
 
@@ -29,20 +32,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         if ($password === $user['password']) {
             // Password matched
             if ($user['type'] === 'alumni') {
-                // Now check approval status from alumni table
                 $stmt2 = $conn->prepare("SELECT * FROM alumni WHERE username = ?");
                 $stmt2->bind_param("s", $username);
                 $stmt2->execute();
-                $alumniResult = $stmt2->get_result();
+                $result2 = $stmt2->get_result();
 
-                if ($alumniResult && $alumniResult->num_rows === 1) {
-                    $alumni = $alumniResult->fetch_assoc();
+                if ($result2 && $result2->num_rows === 1) {
+                    $alumni = $result2->fetch_assoc();
 
                     if ($alumni['approve'] == 1) {
-                        // Approved, proceed to profile
                         $_SESSION['username'] = $username;
                         $_SESSION['user_type'] = 'alumni';
-                        header("Location: loginprofile.php");
+                        $_SESSION['redirect_target'] = 'loginprofile.php';
+                        header("Location: login_redirect.php");
                         exit();
                     } else {
                         $error = "Admin has not approved you yet.";
@@ -52,8 +54,33 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 }
 
                 $stmt2->close();
+
+            } elseif ($user['type'] === 'student') {
+                $stmt3 = $conn->prepare("SELECT * FROM student WHERE username = ?");
+                $stmt3->bind_param("s", $username);
+                $stmt3->execute();
+                $result3 = $stmt3->get_result();
+
+                if ($result3 && $result3->num_rows === 1) {
+                    $student = $result3->fetch_assoc();
+
+                    if ($student['approve'] == 1) {
+                        $_SESSION['username'] = $username;
+                        $_SESSION['user_type'] = 'student';
+                        $_SESSION['redirect_target'] = 'index.php';
+                        header("Location: login_redirect.php");
+                        exit();
+                    } else {
+                        $error = "Admin has not approved you yet.";
+                    }
+                } else {
+                    $error = "Student data not found.";
+                }
+
+                $stmt3->close();
+
             } else {
-                $error = "You are not an alumni.";
+                $error = "Unrecognized user type.";
             }
         } else {
             $error = "Incorrect password.";

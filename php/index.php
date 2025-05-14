@@ -1,4 +1,5 @@
 <?php
+session_start();
 include 'dbconnect.php';
 
 // Predefined font colors to cycle through
@@ -19,18 +20,12 @@ if ($result && $result->num_rows > 0) {
                       htmlspecialchars($row['event_creator']);
 
         $event_display .= "<span style='color: $color; margin-right: 50px;'>$event_text</span>";
-
         $colorIndex++;
     }
 } else {
     $event_display = "<span style='color: white;'>No upcoming events yet.</span>";
 }
 ?>
-
-
-
-
-
 
 <!DOCTYPE html>
 <html lang="en">
@@ -43,10 +38,10 @@ if ($result && $result->num_rows > 0) {
 </head>
 <body>
 
-    <!-- Navigation Bar -->
+<!-- Navigation Bar -->
 <header class="navbar">
     <div class="logo">
-        <a href="index.html">
+        <a href="index.php">
             <img src="../assets/logo2.png" alt="Logo">
         </a>
     </div>
@@ -55,73 +50,76 @@ if ($result && $result->num_rows > 0) {
         <a href="about.html">About</a>
         <a href="help.html">Help</a>
         <a href="contact.html">Contact</a>
-        <a href="http://localhost/student_alumni_network_system/php/event.php">Events</a>
-        <a href="alumni_or_student.html">Register</a>
-        <a href="http://localhost/student_alumni_network_system/php/login.php">Login</a>
+        <a href="event.php">Events</a>
+
+        <?php if (isset($_SESSION['user_type']) && in_array($_SESSION['user_type'], ['student', 'alumni'])): ?>
+    <a href="chat.php">Chat</a>
+    <a href="logout.php">Logout</a>
+<?php else: ?>
+    <a href="alumni_or_student.html">Register</a>
+    <a href="login.php">Login</a>
+<?php endif; ?>
+
     </nav>
 </header>
 
+<!-- Hero Section -->
+<section class="hero">
+    <div class="overlay"></div>
+    <div class="hero-content">
+        <h1>Inspiring Excellence</h1>
+        <h2>Alumni</h2>
+        <p>We all have an equal responsibility to invest time and energy in shaping their thinking and building their capacities to prepare them for the future.</p>
+        <button>See More</button>
+    </div>
+</section>
 
-    <!-- Hero Section -->
+<!-- Events Bar -->
+<section class="scrolling-events">
+    <div class="scrolling-wrapper">
+        <?php echo $event_display ?: 'No upcoming events yet.'; ?>
+    </div>
+</section>
 
-    <section class="hero">
-        <div class="overlay"></div> <!-- ADD this line -->
-        <div class="hero-content">
-            <h1>Inspiring Excellence</h1>
-            <h2>Alumni</h2>
-            <p>We all have an equal responsibility to invest time and energy in shaping their thinking and building their capacities to prepare them for the future.</p>
-            <button>See More</button>
+<!-- Steps Section -->
+<section class="steps">
+    <h1>GET YOURSELF CONNECTED WITH THE EXCELLENCE</h1>
+    <div class="steps-container">
+        <div class="step-card">
+            <div class="step-number">01</div>
+            <h2>Log In/Sign Up</h2>
+            <p>Login if you already have an account. If you don't have an account, sign up to create one.</p>
         </div>
-    </section>
-
-
-    <!-- Events Bar -->
-    <!-- Scrolling Events Section -->
-    <section class="scrolling-events">
-        <div class="scrolling-wrapper">
-            <?php echo $event_display ?: 'No upcoming events yet.'; ?>
+        <div class="step-card">
+            <div class="step-number">02</div>
+            <h2>Fill the Forms</h2>
+            <p>Fill all the forms provided with precise and credible information.</p>
         </div>
-    </section>
-    <!-- Steps Section -->
-    <section class="steps">
-        <h1>GET YOURSELF CONNECTED WITH THE EXCELLENCE</h1>
-        <div class="steps-container">
-            <div class="step-card">
-                <div class="step-number">01</div>
-                <h2>Log In/Sign Up</h2>
-                <p>Login if you already have an account. If you don't have an account, sign up to create one.</p>
-            </div>
-            <div class="step-card">
-                <div class="step-number">02</div>
-                <h2>Fill the Forms</h2>
-                <p>Fill all the forms provided with precise and credible information.</p>
-            </div>
-            <div class="step-card">
-                <div class="step-number">03</div>
-                <h2>Submit Form</h2>
-                <p>Click the submit button after filling all the forms with the necessary data.</p>
-            </div>
+        <div class="step-card">
+            <div class="step-number">03</div>
+            <h2>Submit Form</h2>
+            <p>Click the submit button after filling all the forms with the necessary data.</p>
         </div>
-    </section>
+    </div>
+</section>
 
-    <!-- Requirements Section -->
-    <section class="requirements">
-        <h2>Requirements</h2>
-        <p class="req-description">You must satisfy the following in order to be eligible for this application.</p>
-        <div class="req-cards">
-            <div class="req-card">
-                <img src="../assets/logo2.png" alt="Alumni Logo">
-                <h3>BRAC University Alumni</h3>
-                <p>Applicants must have been officially assigned to, and been a resident of BRAC University during their period of stay in the University.</p>
-            </div>
-            <div class="req-card">
-                <img src="../assets/graduation-hat.png" alt="Graduation Hat">
-                <h3>University Student</h3>
-                <p>Applicants must be a student of BRAC University.</p>
-            </div>
+<!-- Requirements Section -->
+<section class="requirements">
+    <h2>Requirements</h2>
+    <p class="req-description">You must satisfy the following in order to be eligible for this application.</p>
+    <div class="req-cards">
+        <div class="req-card">
+            <img src="../assets/logo2.png" alt="Alumni Logo">
+            <h3>BRAC University Alumni</h3>
+            <p>Applicants must have been officially assigned to, and been a resident of BRAC University during their period of stay in the University.</p>
         </div>
-    </section>
-    
+        <div class="req-card">
+            <img src="../assets/graduation-hat.png" alt="Graduation Hat">
+            <h3>University Student</h3>
+            <p>Applicants must be a student of BRAC University.</p>
+        </div>
+    </div>
+</section>
 
 </body>
 </html>
