@@ -207,11 +207,11 @@ $conn->close();
 
 <div class="navbar">
     <div class="navbar-left">
-        <img src="/assets/logo1.png" alt="BRACU Logo">
+        <img src="../assets/logo1.png" alt="BRACU Logo">
         <h1>Admin Panel</h1>
     </div>
     <div class="navbar-right">
-        <a href="#">Home</a>
+        <a href="index.php">Home</a>
         <a href="#">Admin</a>
         <a href="#">Profile</a>
         <img src="../assets/admin.png" alt="Profile Icon">
