@@ -108,7 +108,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <img src="#" alt="BRACU Logo" class="logo">
             </div>
             <nav class="nav">
-                <a href="index.html">HOME</a>
+                <a href="http://localhost/student_alumni_network_system/php/index.php">HOME</a>
                 <a href="#" class="active">APPLY</a>
                 <a href="#">ABOUT</a>
                 <a href="#">HELP</a>

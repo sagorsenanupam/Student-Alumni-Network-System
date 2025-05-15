@@ -89,6 +89,7 @@ if ($result && $result->num_rows > 0) {
     <nav class="nav-links">
         <a href="index.php">Home</a>
         <a href="about.html">About</a>
+        <a href="alumnipage.php">Alumni</a>
         <a href="help.html">Help</a>
         <a href="contact.html">Contact</a>
         <a href="event.php">Events</a>
