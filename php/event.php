@@ -18,12 +18,32 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $event_creator = trim($_POST['event_creator']);
 
     if (!empty($event_name) && !empty($event_description) && !empty($start_time) && !empty($end_time) && !empty($event_creator)) {
-        $check_stmt = $conn->prepare("SELECT 1 FROM user WHERE username = ?");
-        $check_stmt->bind_param("s", $event_creator);
-        $check_stmt->execute();
-        $check_stmt->store_result();
+        // Check approval from Alumni table
+        $stmt = $conn->prepare("SELECT approve FROM Alumni WHERE username = ?");
+        $stmt->bind_param("s", $event_creator);
+        $stmt->execute();
+        $stmt->bind_result($approve);
+        if ($stmt->fetch()) {
+            $stmt->close();
+        } else {
+            $stmt->close();
 
-        if ($check_stmt->num_rows > 0) {
+            // If not found in Alumni, check Student
+            $stmt = $conn->prepare("SELECT approve FROM Student WHERE username = ?");
+            $stmt->bind_param("s", $event_creator);
+            $stmt->execute();
+            $stmt->bind_result($approve);
+            if (!$stmt->fetch()) {
+                $error = "Event creator not found in Alumni or Student tables.";
+                $stmt->close();
+                $conn->close();
+                return;
+            }
+            $stmt->close();
+        }
+
+        if ($approve == 1) {
+            // Insert event
             $stmt = $conn->prepare("INSERT INTO event (event_name, event_description, start_time, end_time, event_creator) VALUES (?, ?, ?, ?, ?)");
             $stmt->bind_param("sssss", $event_name, $event_description, $start_time, $end_time, $event_creator);
 
@@ -35,9 +55,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             }
             $stmt->close();
         } else {
-            $error = "Event creator not found in database.";
+            $error = "Admin hasn't approved you yet. Event creation denied.";
         }
-        $check_stmt->close();
     } else {
         $error = "All fields are required.";
     }
@@ -45,6 +64,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $conn->close();
 }
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">
